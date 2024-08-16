@@ -19,24 +19,17 @@
       "attrs": { "color": "lime" }
     },
     {
-      "type": "wokwi-pushbutton",
-      "id": "btn1",
-      "top": -137.8,
-      "left": 796.8,
-      "attrs": { "color": "green" }
-    },
-    {
       "type": "board-ssd1306",
       "id": "oled1",
-      "top": 60.74,
-      "left": 787.43,
+      "top": 147.14,
+      "left": 125.03,
       "attrs": { "i2cAddress": "0x3c" }
     },
     {
       "type": "wokwi-buzzer",
       "id": "bz1",
-      "top": -74.4,
-      "left": 798.6,
+      "top": 31.2,
+      "left": -276.6,
       "attrs": { "volume": "0.1" }
     },
     {
@@ -47,8 +40,15 @@
       "rotate": 270,
       "attrs": { "travelLength": "30" }
     },
-    { "type": "wokwi-potentiometer", "id": "pot2", "top": 190.7, "left": 806.2, "attrs": {} },
-    { "type": "wokwi-dht22", "id": "dht1", "top": 336.3, "left": 810.6, "attrs": {} }
+    { "type": "wokwi-potentiometer", "id": "pot2", "top": -78.1, "left": -163.4, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -124.5, "left": 90.6, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton-6mm",
+      "id": "btn2",
+      "top": 180.2,
+      "left": -67.2,
+      "attrs": { "color": "green" }
+    }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
@@ -75,7 +75,19 @@
     [ "bargraph1:A4", "esp:18", "green", [ "h0.4", "v-38.4", "h38", "v76.8" ] ],
     [ "bargraph1:A3", "esp:8", "green", [ "h0.4", "v-28.8", "h38", "v67.2" ] ],
     [ "bargraph1:A2", "esp:3", "green", [ "h0.4", "v-19.2", "h38", "v57.6" ] ],
-    [ "bargraph1:A1", "esp:46", "green", [ "h0.4", "v-9.6", "h38", "v48" ] ]
+    [ "bargraph1:A1", "esp:46", "green", [ "h0.4", "v-9.6", "h38", "v48" ] ],
+    [ "oled1:GND", "esp:GND.4", "black", [ "h-48", "v76.8" ] ],
+    [ "oled1:VCC", "esp:3V3.1", "red", [ "v0" ] ],
+    [ "oled1:SCL", "esp:1", "green", [ "v0" ] ],
+    [ "oled1:SDA", "esp:2", "green", [ "v0" ] ],
+    [ "bz1:1", "esp:GND.1", "black", [ "v0" ] ],
+    [ "bz1:2", "esp:9", "orange", [ "v0" ] ],
+    [ "esp:3V3.1", "btn2:1.r", "red", [ "h-38.45", "v153.6" ] ],
+    [ "esp:GND.1", "btn2:2.r", "black", [ "h-48.05", "v-28.8" ] ],
+    [ "btn2:2.l", "esp:10", "gold", [ "v-28.4", "h76.85" ] ],
+    [ "pot2:VCC", "esp:3V3.1", "red", [ "v28.8", "h124.05" ] ],
+    [ "pot2:GND", "esp:GND.1", "black", [ "h19.2", "v240" ] ],
+    [ "pot2:SIG", "esp:11", "blue", [ "v0" ] ]
   ],
   "dependencies": {}
 }

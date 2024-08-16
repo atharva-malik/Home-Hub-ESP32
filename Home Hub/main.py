@@ -33,17 +33,19 @@ timeLeft = 0 # Time Left in Session
 sesLen = 0 # Session length
 
 # Generic functions
-def map_value(value, range1_min, range1_max, range2_min, range2_max):
+def mapValue(value, range1_min, range1_max, range2_min, range2_max):
     ratio = (value - range1_min) / (range1_max - range1_min)
     mapped_value = ratio * (range2_max - range2_min) + range2_min
     return int(mapped_value)
 
+# Bar Graph functions
+def valToGraph(value):
+    for i in range(10):
+        if i < value:
+            barGraphPins[i].value(1)
+        else:
+            barGraphPins[i].value(0)
+
 while True:
-  sliderVal = map_value(sl.read(), 0, 4095, 0, 10)
-#   for i in barGraphPins:
-#     i.value(1)
-#     time.sleep(1)
-  print()
-#   for i in barGraphPins:
-#     i.value(0)
-#     time.sleep(1)
+  sliderVal = mapValue(sl.read(), 0, 4095, 0, 10)
+  valToGraph(sliderVal)
