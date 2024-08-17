@@ -17,6 +17,9 @@
 from machine import Pin, ADC
 import time
 
+# OLED Import
+from oled import *
+
 # Slider setup
 p4 = Pin(4, Pin.IN)
 sl = ADC(p4)
@@ -45,7 +48,8 @@ def valToGraph(value):
             barGraphPins[i].value(1)
         else:
             barGraphPins[i].value(0)
-
+    
+    # sliderVal = mapValue(sl.read(), 0, 4095, 0, 10)
+    # valToGraph(sliderVal)
 while True:
-  sliderVal = mapValue(sl.read(), 0, 4095, 0, 10)
-  valToGraph(sliderVal)
+    displayImage(EYES, 64, 64)
