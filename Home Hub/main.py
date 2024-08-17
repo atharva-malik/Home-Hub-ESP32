@@ -14,11 +14,18 @@
 # Button: To reset session
 
 # Generic Imports
-from machine import Pin, ADC
+from machine import Pin, ADC, PWM
 import time
 
 # OLED Import
 from oled import *
+
+# Temp import and setup
+from dht import DHT22
+tempSensor = DHT22(42)
+
+# Buzzer import and setup
+from buzzerPy import BUZZER, mario, jingle, twinkle
 
 # Slider setup
 p4 = Pin(4, Pin.IN)
@@ -28,6 +35,9 @@ sliderVal = sl.read() # Ranges from 0-4095 (inclusive)
 
 # Led Bar Graph setup
 barGraphPins = [Pin(46, Pin.OUT), Pin(3, Pin.OUT), Pin(8, Pin.OUT), Pin(18, Pin.OUT), Pin(17, Pin.OUT), Pin(16, Pin.OUT), Pin(15, Pin.OUT), Pin(7, Pin.OUT), Pin(6, Pin.OUT), Pin(5, Pin.OUT)]
+
+# Buzzer setup
+buzzer = BUZZER(Pin(9, Pin.OUT))
 
 # Planning out the variables:
 cTemp = 0 # Current Temperature
@@ -41,6 +51,16 @@ def mapValue(value, range1_min, range1_max, range2_min, range2_max):
     mapped_value = ratio * (range2_max - range2_min) + range2_min
     return int(mapped_value)
 
+def getTemp():
+    try:
+        tempSensor.measure()
+        temp = tempSensor.temperature()
+        humidity = tempSensor.humidity()
+    except Exception as e:
+        print(e)
+        temp, humidity = -1, -1
+    return temp, humidity
+
 # Bar Graph functions
 def valToGraph(value):
     for i in range(10):
@@ -51,5 +71,19 @@ def valToGraph(value):
     
     # sliderVal = mapValue(sl.read(), 0, 4095, 0, 10)
     # valToGraph(sliderVal)
+
 while True:
     displayImage(EYES, 64, 64)
+    print(getTemp())
+    print("Playing mario.")
+    buzzer.play(mario, 150, 32767)
+    time.sleep_ms(1000)
+
+    print("Playing jingle bells.")
+    buzzer.play(jingle, 250, 32767)
+    time.sleep_ms(1000)
+
+    print("Playing twinkle, twinkle little star.")
+    buzzer.play(twinkle, 600, 32767)
+    time.sleep_ms(1000)
+    
