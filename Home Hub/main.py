@@ -14,8 +14,8 @@
 # Button: To reset session
 
 # Generic Imports
-from machine import Pin, ADC, PWM
-import time
+from machine import Pin, ADC, PWM, RTC, Timer
+import time, timer
 
 # OLED Import
 from oled import *
@@ -45,6 +45,43 @@ cHum = 0 # Current Humidity
 timeLeft = 0 # Time Left in Session
 sesLen = 0 # Session length
 
+# Setup RTC
+"""
+year: 4-digit year (e.g., 2024)
+month: 1-12 (e.g., 3)
+day: 1-31 (e.g., 18)
+weekday: 0-6 (0 is Monday)
+hour: 0-23 (e.g., 14)
+minute: 0-59 (e.g., 31)
+second: 0-59 (e.g., 43)
+microsecond: 0-999999 (optional
+"""
+rtc = RTC()
+rtc.datetime((1000, 1, 1, 0, 0, 0, 0, 0)) # Setting up RTC
+"""
+LOTS OF RESEARCH
+
+This is for future reference
+start_time = rtc.datetime()
+# Perform actions...
+end_time = rtc.datetime()
+elapsed_time = end_time - start_time
+
+# Create a timer that fires every 5 seconds
+timer = Timer(-1)
+timer.init(period=5, mode=Timer.PERIODIC, callback=callbackFunction)
+
+Timer Parameters
+period: The time interval between timer events, in seconds.
+mode: The timer mode:
+machine.Timer.ONE_SHOT: The timer fires once and then stops.
+machine.Timer.PERIODIC: The timer fires repeatedly at the specified interval.
+callback: A function to be called when the timer fires.
+
+timer.deinit() # This stops the timer
+"""
+time = timer.TIMER(12)
+
 # Generic functions
 def mapValue(value, range1_min, range1_max, range2_min, range2_max):
     ratio = (value - range1_min) / (range1_max - range1_min)
@@ -61,6 +98,13 @@ def getTemp():
         temp, humidity = -1, -1
     return temp, humidity
 
+def callbackFunction(timer):
+    print("Time UP!")
+
+def readButton(pinNum):
+    pin = Pin(pinNum, Pin.IN)
+    return pin.value()
+
 # Bar Graph functions
 def valToGraph(value):
     for i in range(10):
@@ -72,18 +116,9 @@ def valToGraph(value):
     # sliderVal = mapValue(sl.read(), 0, 4095, 0, 10)
     # valToGraph(sliderVal)
 
+
 while True:
     displayImage(EYES, 64, 64)
     print(getTemp())
-    print("Playing mario.")
-    buzzer.play(mario, 150, 32767)
-    time.sleep_ms(1000)
-
-    print("Playing jingle bells.")
-    buzzer.play(jingle, 250, 32767)
-    time.sleep_ms(1000)
-
-    print("Playing twinkle, twinkle little star.")
-    buzzer.play(twinkle, 600, 32767)
-    time.sleep_ms(1000)
-    
+    print(readButton(10))
+    time.getTime()
