@@ -22,17 +22,16 @@ class TIMER:
         """
         convertedEndTime = self.convertToTime(endTime)
         finalEndTime = (0, 0, 0, 0, convertedEndTime[0], convertedEndTime[1], convertedEndTime[2], 0)
-        result = (0, 0, 0, 0, 0, 0, 0, 0)
-        for i, t in enumerate(startTime):
-            result[i] = t+
+        result = (startTime[0] + convertedEndTime[0], startTime[1] + convertedEndTime[1], startTime[2] + convertedEndTime[2], startTime[3] + convertedEndTime[3], startTime[4] + convertedEndTime[4], startTime[5] + convertedEndTime[5], startTime[6] + convertedEndTime[6], startTime[7] + convertedEndTime[7])
+        return result
 
     def convertToTime(self, secs):        
         if 3600 > secs >= 60:
-            return (0, secs//60, secs%60)
+            return (0, 0, 0, 0, 0, secs//60, secs%60, 0)
         elif secs >= 3600:
-            return (secs//3600, secs%3600, secs%60)
+            return (0, 0, 0, 0, secs//3600, secs%3600, secs%60, 0)
         else:
-            return (0, 0, secs)
+            return (0, 0, 0, 0, 0, 0, secs, 0)
 
     def startTimer(self, endTime):
         startTime = rtc.datetime()

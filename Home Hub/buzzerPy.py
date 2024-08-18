@@ -116,10 +116,14 @@ class BUZZER:
         # Disconnect the pwm driver
         #self.pwm.deinit() # remove to play the next melodies
         
-    def tone(self, notes, wait, duty=32767):
+    def tone(self, notes, duty=32767):
         self.pwm.freq(notes)
         self.pwm.duty_u16(duty)
-        sleep_ms(wait)
+    
+    def no_tone(self, notes, wait, duty=32767):
+        # self.pwm.freq(notes)
+        # self.pwm.duty_u16(duty)
+        # sleep_ms(wait)
         self.pwm.duty_u16(0)
 
 # Sample melodies:

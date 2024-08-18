@@ -25,7 +25,7 @@ from dht import DHT22
 tempSensor = DHT22(42)
 
 # Buzzer import and setup
-from buzzerPy import BUZZER, mario, jingle, twinkle
+import buzzerPy
 
 # Slider setup
 p4 = Pin(4, Pin.IN)
@@ -37,49 +37,16 @@ sliderVal = sl.read() # Ranges from 0-4095 (inclusive)
 barGraphPins = [Pin(46, Pin.OUT), Pin(3, Pin.OUT), Pin(8, Pin.OUT), Pin(18, Pin.OUT), Pin(17, Pin.OUT), Pin(16, Pin.OUT), Pin(15, Pin.OUT), Pin(7, Pin.OUT), Pin(6, Pin.OUT), Pin(5, Pin.OUT)]
 
 # Buzzer setup
-buzzer = BUZZER(Pin(9, Pin.OUT))
+buzzer = buzzerPy.BUZZER(Pin(9, Pin.OUT))
 
 # Planning out the variables:
+cScreen = "session" # The others are: session, temperature
 cTemp = 0 # Current Temperature
 cHum = 0 # Current Humidity
 timeLeft = 0 # Time Left in Session
 sesLen = 0 # Session length
-
-# Setup RTC
-"""
-year: 4-digit year (e.g., 2024)
-month: 1-12 (e.g., 3)
-day: 1-31 (e.g., 18)
-weekday: 0-6 (0 is Monday)
-hour: 0-23 (e.g., 14)
-minute: 0-59 (e.g., 31)
-second: 0-59 (e.g., 43)
-microsecond: 0-999999 (optional
-"""
-rtc = RTC()
-rtc.datetime((1000, 1, 1, 0, 0, 0, 0, 0)) # Setting up RTC
-"""
-LOTS OF RESEARCH
-
-This is for future reference
-start_time = rtc.datetime()
-# Perform actions...
-end_time = rtc.datetime()
-elapsed_time = end_time - start_time
-
-# Create a timer that fires every 5 seconds
-timer = Timer(-1)
-timer.init(period=5, mode=Timer.PERIODIC, callback=callbackFunction)
-
-Timer Parameters
-period: The time interval between timer events, in seconds.
-mode: The timer mode:
-machine.Timer.ONE_SHOT: The timer fires once and then stops.
-machine.Timer.PERIODIC: The timer fires repeatedly at the specified interval.
-callback: A function to be called when the timer fires.
-
-timer.deinit() # This stops the timer
-"""
+warning = False
+err = None
 
 # Generic functions
 def mapValue(value, range1_min, range1_max, range2_min, range2_max):
@@ -116,10 +83,52 @@ def valToGraph(value):
     # valToGraph(sliderVal)
 
 
+# Update Functions
+def checkTemps(currentTemperature, currentHumidity):
+    feelsLikeTemperature = (currentTemperature * 0.7) + (currentHumidity * 0.3)
+    print(feelsLikeTemperature)
+    if not warning:
+        if feelsLikeTemperature > 36:
+            err = "TH"
+        elif feelsLikeTemperature < 10:
+            err = "TC"
+        else:
+            err = None
+    if err == "TH":
+        warning = True
+        buzzer.tone(buzzerPy.A5)
+        setScreen()
+    elif err == "TC":
+        warning = True
+        buzzer.tone(buzzerPy.A5)
+        setScreen()
+
+def checkButton():
+    pass
+
+def checkSession():
+    pass
+
+def checkPotentiometer():
+    setScreen()
+
+def checkSlider():
+    pass 
+
+def updateScreen():
+    pass
+
+def setScreen():
+    pass
+
 time = timer.TIMER(12)
 displayImage(EYES, 64, 64)
 time.startTimer(12)
 while True:
-    print(getTemp())
-    print(readButton(10))
-    print(time.checkTime())
+    cTemp, cHum = getTemp()
+    checkTemps(cTemp, cHum)
+    checkButton()
+    checkSession()
+    checkPotentiometer() # This is the potentiometer
+    checkSlider() # This is only in case the session is over
+    updateScreen()
