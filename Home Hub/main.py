@@ -80,7 +80,6 @@ callback: A function to be called when the timer fires.
 
 timer.deinit() # This stops the timer
 """
-time = timer.TIMER(12)
 
 # Generic functions
 def mapValue(value, range1_min, range1_max, range2_min, range2_max):
@@ -117,8 +116,10 @@ def valToGraph(value):
     # valToGraph(sliderVal)
 
 
+time = timer.TIMER(12)
+displayImage(EYES, 64, 64)
+time.startTimer(12)
 while True:
-    displayImage(EYES, 64, 64)
     print(getTemp())
     print(readButton(10))
-    time.getTime()
+    print(time.checkTime())
