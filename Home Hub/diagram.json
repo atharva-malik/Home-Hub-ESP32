@@ -46,7 +46,7 @@
       "top": 22.2,
       "left": 239.1,
       "rotate": 90,
-      "attrs": { "temperature": "24.6", "humidity": "47.5" }
+      "attrs": { "temperature": "26.2", "humidity": "28.5" }
     },
     {
       "type": "wokwi-pushbutton-6mm",

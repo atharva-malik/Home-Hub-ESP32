@@ -46,6 +46,7 @@ cHum = 80 # Current Humidity
 timeLeft = 0 # Time Left in Session
 targetTime = 0
 sesLen = 0 # Session length
+sliderVal = 0
 warning = False
 err = None
 btnPressTime = 750
@@ -81,6 +82,10 @@ def valToGraph(value):
     # sliderVal = mapValue(sl.read(), 0, 4095, 0, 10)
     # valToGraph(sliderVal)
 
+def updateGraph(target, current, temp=0):
+    val = mapValue(current, temp, target, 0, 10)
+    valToGraph(val)
+
 
 # Update Functions
 def checkTemps(currentTemperature, currentHumidity):
@@ -88,7 +93,6 @@ def checkTemps(currentTemperature, currentHumidity):
     global btnPressTime
     global err
     feelsLikeTemperature = (currentTemperature * 0.7) + (currentHumidity * 0.3)
-    print(feelsLikeTemperature)
     if not warning and btnPressTime > 750:
         if feelsLikeTemperature > 36:
             err = "TH"
@@ -105,24 +109,30 @@ def checkTemps(currentTemperature, currentHumidity):
     if err == "TH":
         warning = True
         buzzer.tone(buzzerPy.A5)
-        setScreen()
     elif err == "TC":
         warning = True
         buzzer.tone(buzzerPy.A5)
-        setScreen()
 
 def checkButton():
     global warning
     global btnPressTime
     global err
     global isSessOn
-    if warning and readButton(10):
+    global targetTime
+    if warning and readButton(10) and err != "S":
         warning = False
         err = None
         btnPressTime = 0
         buzzer.notone()
-    elif not isSessOn and readButton(10):
+    elif warning and readButton(10) and err == "S":
+        targetTime = 0
+        isSessOn = False
+        warning = False
+        err = None
+        btnPressTime = 0
+    elif not isSessOn and readButton(10) and sl.read() > 0:
         isSessOn = True
+        targetTime = mapValue(sl.read(), 0, 4095, 0, 60)
 
 def checkSession():
     global isSessOn
@@ -130,17 +140,20 @@ def checkSession():
         time.sleep(1)
         timeLeft -= 1
         if timeLeft <= 0:
+            timeLeft = 0
+            targetTime = 0
             isSessOn = False
             buzzer.tone(buzzerPy.A5)
             warning = True
             err = "S"
 
 def checkSlider():
-    pass
-
-def updateGraph(target, current, temp=0):
-    val = mapValue(current, temp, target, 0, 10)
-    valToGraph(val)
+    global sliderVal
+    global targetTime
+    slVal = sl.read()
+    sliderVal = mapValue(slVal, 0, 4095, 0, 10)
+    if sliderVal != 0 and isSessOn != True:
+        valToGraph(sliderVal)
 
 def updateScreen():
     global targetTime
@@ -151,8 +164,12 @@ def updateScreen():
     if isSessOn:
         displayText(("Time left: " + str(timeLeft) + "m"), 0, 30, False)
         updateGraph(targetTime, timeLeft)
+    elif sl.read() > 0:
+        displayText(("Target Time: " + str(targetTime) + "m"), 0, 30, False)
+        displayText("Press button to", 0, 40, False)
+        displayText("start the session", -5, 50, False)
     else:
-        updateGraph(36, flt, 10)
+        updateGraph(86, flt, 5)
 
 # displayImage(EYES, 64, 64)
 # time.startTimer(12)
@@ -164,5 +181,7 @@ while True:
     checkSlider() # This is only in case the session is over
     updateScreen()
     checkSession()
-    print(btnPressTime)
+    # print(btnPressTime)
+    print(targetTime, sl.read(), mapValue(sl.read(), 0, 4095, 0, 60))
     btnPressTime += 1 # AROUND 10 ish FPS
+    targetTime = mapValue(sl.read(), 0, 4095, 0, 60)
