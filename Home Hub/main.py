@@ -41,8 +41,8 @@ buzzer = buzzerPy.BUZZER(Pin(9, Pin.OUT))
 
 # Planning out the variables:
 isSessOn = False
-cTemp = 0 # Current Temperature
-cHum = 0 # Current Humidity
+cTemp = 80 # Current Temperature
+cHum = 80 # Current Humidity
 timeLeft = 0 # Time Left in Session
 targetTime = 0
 sesLen = 0 # Session length
@@ -98,10 +98,10 @@ def checkTemps(currentTemperature, currentHumidity):
             err = None
             buzzer.notone()
     else:
-        warning = False
-        err = None
-        if feelsLikeTemperature < 36 and feelsLikeTemperature > 10:
+        if feelsLikeTemperature < 36 and feelsLikeTemperature > 10 and err != "S":
             buzzer.notone()
+            warning = False
+            err = None
     if err == "TH":
         warning = True
         buzzer.tone(buzzerPy.A5)
@@ -114,19 +114,33 @@ def checkTemps(currentTemperature, currentHumidity):
 def checkButton():
     global warning
     global btnPressTime
+    global err
+    global isSessOn
     if warning and readButton(10):
         warning = False
+        err = None
         btnPressTime = 0
         buzzer.notone()
+    elif not isSessOn and readButton(10):
+        isSessOn = True
 
 def checkSession():
-    pass
+    global isSessOn
+    if isSessOn:
+        time.sleep(1)
+        timeLeft -= 1
+        if timeLeft <= 0:
+            isSessOn = False
+            buzzer.tone(buzzerPy.A5)
+            warning = True
+            err = "S"
 
 def checkSlider():
-    pass 
+    pass
 
-def updateGraph(target, current):
-    val = mapValue()
+def updateGraph(target, current, temp=0):
+    val = mapValue(current, temp, target, 0, 10)
+    valToGraph(val)
 
 def updateScreen():
     global targetTime
@@ -138,17 +152,17 @@ def updateScreen():
         displayText(("Time left: " + str(timeLeft) + "m"), 0, 30, False)
         updateGraph(targetTime, timeLeft)
     else:
-        updateGraph(36, flt)
+        updateGraph(36, flt, 10)
 
-time = timer.TIMER()
 # displayImage(EYES, 64, 64)
 # time.startTimer(12)
+cTemp, cHum = getTemp()
 while True:
     cTemp, cHum = getTemp()
     checkTemps(cTemp, cHum)
     checkButton()
-    checkSession()
     checkSlider() # This is only in case the session is over
     updateScreen()
+    checkSession()
     print(btnPressTime)
     btnPressTime += 1 # AROUND 10 ish FPS
