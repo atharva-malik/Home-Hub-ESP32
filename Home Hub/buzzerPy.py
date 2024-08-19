@@ -120,7 +120,7 @@ class BUZZER:
         self.pwm.freq(notes)
         self.pwm.duty_u16(duty)
     
-    def no_tone(self, notes, wait, duty=32767):
+    def notone(self):
         # self.pwm.freq(notes)
         # self.pwm.duty_u16(duty)
         # sleep_ms(wait)

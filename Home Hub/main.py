@@ -40,13 +40,15 @@ barGraphPins = [Pin(46, Pin.OUT), Pin(3, Pin.OUT), Pin(8, Pin.OUT), Pin(18, Pin.
 buzzer = buzzerPy.BUZZER(Pin(9, Pin.OUT))
 
 # Planning out the variables:
-cScreen = "session" # The others are: session, temperature
+isSessOn = False
 cTemp = 0 # Current Temperature
 cHum = 0 # Current Humidity
 timeLeft = 0 # Time Left in Session
+targetTime = 0
 sesLen = 0 # Session length
 warning = False
 err = None
+btnPressTime = 750
 
 # Generic functions
 def mapValue(value, range1_min, range1_max, range2_min, range2_max):
@@ -63,9 +65,6 @@ def getTemp():
         print(e)
         temp, humidity = -1, -1
     return temp, humidity
-
-def callbackFunction(timer):
-    print("Time UP!")
 
 def readButton(pinNum):
     pin = Pin(pinNum, Pin.IN)
@@ -85,15 +84,24 @@ def valToGraph(value):
 
 # Update Functions
 def checkTemps(currentTemperature, currentHumidity):
+    global warning
+    global btnPressTime
+    global err
     feelsLikeTemperature = (currentTemperature * 0.7) + (currentHumidity * 0.3)
     print(feelsLikeTemperature)
-    if not warning:
+    if not warning and btnPressTime > 750:
         if feelsLikeTemperature > 36:
             err = "TH"
         elif feelsLikeTemperature < 10:
             err = "TC"
         else:
             err = None
+            buzzer.notone()
+    else:
+        warning = False
+        err = None
+        if feelsLikeTemperature < 36 and feelsLikeTemperature > 10:
+            buzzer.notone()
     if err == "TH":
         warning = True
         buzzer.tone(buzzerPy.A5)
@@ -104,31 +112,43 @@ def checkTemps(currentTemperature, currentHumidity):
         setScreen()
 
 def checkButton():
-    pass
+    global warning
+    global btnPressTime
+    if warning and readButton(10):
+        warning = False
+        btnPressTime = 0
+        buzzer.notone()
 
 def checkSession():
     pass
 
-def checkPotentiometer():
-    setScreen()
-
 def checkSlider():
     pass 
 
+def updateGraph(target, current):
+    val = mapValue()
+
 def updateScreen():
-    pass
+    global targetTime
+    temp, hum = getTemp()
+    flt = (temp * 0.7) + (hum * 0.3)
+    displayText(("Temperature: " + str(round(flt)) + "c"), 0, 0)
+    displayText(("Humidity: " + str(hum) + "%"), 0, 10, False)
+    if isSessOn:
+        displayText(("Time left: " + str(timeLeft) + "m"), 0, 30, False)
+        updateGraph(targetTime, timeLeft)
+    else:
+        updateGraph(36, flt)
 
-def setScreen():
-    pass
-
-time = timer.TIMER(12)
-displayImage(EYES, 64, 64)
-time.startTimer(12)
+time = timer.TIMER()
+# displayImage(EYES, 64, 64)
+# time.startTimer(12)
 while True:
     cTemp, cHum = getTemp()
     checkTemps(cTemp, cHum)
     checkButton()
     checkSession()
-    checkPotentiometer() # This is the potentiometer
     checkSlider() # This is only in case the session is over
     updateScreen()
+    print(btnPressTime)
+    btnPressTime += 1 # AROUND 10 ish FPS

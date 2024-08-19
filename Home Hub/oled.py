@@ -24,3 +24,9 @@ def displayAnimation(stages, sizeX, sizeY, speed=0.01):
     for i in stages:
         time.sleep(speed)
         displayImage(i, sizeX, sizeY)
+
+def displayText(text, x, y, reset=True):
+    if reset:
+        oled.fill(0)
+    oled.text(text, x, y)
+    oled.show()

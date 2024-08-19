@@ -5,9 +5,8 @@ rtc = RTC()
 rtc.datetime((1000, 1, 1, 0, 0, 0, 0, 0)) # Setting up RTC
 
 class TIMER:
-    def __init__(self, endTime):
-        startTime = rtc.datetime()
-        self.targetTime = self.addTime(endTime, startTime)
+    def __init__(self):
+        pass
     
     def addTime(self, endTime, startTime):
         """
