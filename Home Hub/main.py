@@ -14,8 +14,8 @@
 # Button: To reset session
 
 # Generic Imports
-from machine import Pin, ADC, PWM, RTC, Timer
-import time, timer
+from machine import Pin, ADC, PWM
+import time
 
 # OLED Import
 from oled import *
@@ -79,8 +79,6 @@ def valToGraph(value):
         else:
             barGraphPins[i].value(0)
     
-    # sliderVal = mapValue(sl.read(), 0, 4095, 0, 10)
-    # valToGraph(sliderVal)
 
 def updateGraph(target, current, temp=0):
     val = mapValue(current, temp, target, 0, 10)
@@ -171,8 +169,7 @@ def updateScreen():
     else:
         updateGraph(86, flt, 5)
 
-# displayImage(EYES, 64, 64)
-# time.startTimer(12)
+
 cTemp, cHum = getTemp()
 while True:
     cTemp, cHum = getTemp()
