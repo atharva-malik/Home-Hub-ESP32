@@ -79,7 +79,6 @@ def valToGraph(value):
         else:
             barGraphPins[i].value(0)
     
-
 def updateGraph(target, current, temp=0):
     val = mapValue(current, temp, target, 0, 10)
     valToGraph(val)
@@ -117,6 +116,7 @@ def checkButton():
     global err
     global isSessOn
     global targetTime
+    global timeLeft
     if warning and readButton(10) and err != "S":
         warning = False
         err = None
@@ -131,11 +131,13 @@ def checkButton():
     elif not isSessOn and readButton(10) and sl.read() > 0:
         isSessOn = True
         targetTime = mapValue(sl.read(), 0, 4095, 0, 60)
+        timeLeft = targetTime*60 # Convert it to seconds
 
 def checkSession():
     global isSessOn
+    global timeLeft
     if isSessOn:
-        time.sleep(1)
+        # time.sleep(0.8) # Allow for processing of other things
         timeLeft -= 1
         if timeLeft <= 0:
             timeLeft = 0
@@ -155,13 +157,14 @@ def checkSlider():
 
 def updateScreen():
     global targetTime
+    global timeLeft
     temp, hum = getTemp()
     flt = (temp * 0.7) + (hum * 0.3)
     displayText(("Temperature: " + str(round(flt)) + "c"), 0, 0)
     displayText(("Humidity: " + str(hum) + "%"), 0, 10, False)
     if isSessOn:
-        displayText(("Time left: " + str(timeLeft) + "m"), 0, 30, False)
-        updateGraph(targetTime, timeLeft)
+        displayText(("Time left: " + str(timeLeft) + "s"), 0, 30, False)
+        updateGraph(targetTime, timeLeft/60)
     elif sl.read() > 0:
         displayText(("Target Time: " + str(targetTime) + "m"), 0, 30, False)
         displayText("Press button to", 0, 40, False)
@@ -179,6 +182,6 @@ while True:
     updateScreen()
     checkSession()
     # print(btnPressTime)
-    print(targetTime, sl.read(), mapValue(sl.read(), 0, 4095, 0, 60))
+    print(targetTime, timeLeft)
     btnPressTime += 1 # AROUND 10 ish FPS
     targetTime = mapValue(sl.read(), 0, 4095, 0, 60)
